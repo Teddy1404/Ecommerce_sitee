@@ -10,7 +10,7 @@ const CreateCategory = () => {
 
 const[categories,setcategories] =  useState([]);
 const[name,setName] = useState("");
-const [visible, setVisible] = useState(false);
+const [open, setopen] = useState(false);
 const [selected, setSelected] = useState(null);
 const [updatedName, setUpdatedName] = useState("");
 //handle form
@@ -20,20 +20,20 @@ const handleSubmit = async (e)=>{
     const {data} = await axios.post('http://localhost:8080/api/v1/category/create-category',{name,})
     if(data?.success){
       toast.success(` category "${name}" is created`);
-      getAllcategory();
+      getAllCategory();
     }
   } catch (error) {
     console.log(error);
     toast.error('something went wrong in input form ')
   }
 }
+//get all category
 
-
-const getAllcategory = async ()=>{
+const getAllCategory = async ()=>{
   try {
     const {data} = await axios.get('http://localhost:8080/api/v1/category/get-category');
   if(data?.success){
-    setcategories(data.category);
+    setcategories(data?.category);
   }
   } catch (error) {
     console.log(error);
@@ -42,7 +42,7 @@ const getAllcategory = async ()=>{
 };
 
 useEffect(() => {
-  getAllcategory();  
+  getAllCategory();  
 }, []);
 
 
@@ -58,8 +58,8 @@ const handleUpdate = async (e) => {
       toast.success(`${updatedName} is updated`);
       setSelected(null);
       setUpdatedName("");
-      setVisible(false);
-      getAllcategory();
+      setopen(false);
+      getAllCategory();
     } else {
       toast.error(data.message);
     }
@@ -77,7 +77,7 @@ const handleDelete = async (pId) => {
     );
     if (data?.success) {
       toast.success(`category is deleted`);
-      getAllcategory();
+      getAllCategory();
     } else {
       toast.error(data.message);
     }
@@ -115,12 +115,12 @@ const handleDelete = async (pId) => {
    {categories?.map((c)=>{
    return (
      <>
-     <tr>
+     <tr key={c._id}>
        <td key={c._id}>{c.name}</td>
        <td>
          <button className='btn btn-primary m-2 '
             onClick={() => {
-              setVisible(true);
+              setopen(true);
               setUpdatedName(c.name);
               setSelected(c);
             }}
@@ -138,8 +138,8 @@ const handleDelete = async (pId) => {
      </div>
    
      </div>
-     <Modal onCancel={()=> setVisible(false)}
-     footer={null} visible={visible}>
+     <Modal onCancel={()=> setopen(false)}
+     footer={null} open={open}>
       <CategoryForm 
       alue={updatedName}
       setValue={setUpdatedName}
